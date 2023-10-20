@@ -17,14 +17,25 @@ def dividentsheet(symbols,startdate,enddate):
         div.append(inst.dividends)
     
     df = pd.DataFrame(div,index=symbol_with_extention)
+    df.fillna(0)
+    
+    df.columns = pd.to_datetime(df.columns)
+    
     df.columns = [date.strftime('%B %Y') for date in df.columns]
+    
+    
 
     
-    df.fillna(0)
+    
     df = df.groupby(df.columns,axis=1).sum()
+    df = df[sorted(df.columns, key=pd.to_datetime)]
+
     
     return df    
     
 
 
-dividentsheet(["TCS","INFY",'WIPRO'],"2023-01-01","2023-12-30")
+
+
+
+
