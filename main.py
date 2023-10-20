@@ -17,11 +17,13 @@ def dividentsheet(symbols,startdate,enddate):
         div.append(inst.dividends)
     
     df = pd.DataFrame(div,index=symbol_with_extention)
-    df.columns = df.columns.month 
+    df.columns = [date.strftime('%B %Y') for date in df.columns]
+
+    
     df.fillna(0)
     df = df.groupby(df.columns,axis=1).sum()
-    return df
     
+    return df    
     
 
 
