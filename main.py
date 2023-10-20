@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 import datetime as dt
 
-def dividentsheet(symbols,startdate,enddate):
+def dividendsheet(symbols,startdate,enddate):
     if not isinstance (symbols,list):
         symbols = [symbols]
     
@@ -35,7 +35,38 @@ def dividentsheet(symbols,startdate,enddate):
     
 
 
+### ------- Dividend filter function ----########
 
+def dividend_filter(symbols, startdate, enddate):
+    if not isinstance(symbols, list):
+        symbols = [symbols]
+
+    symbol_with_extension = [symbol + ".NS" for symbol in symbols]
+
+    div = {}
+    for i in symbol_with_extension:
+        inst = yf.Ticker(i)
+        inst.history(period='1d', start=startdate, end=enddate)
+        dividend_data = inst.dividends
+
+        if not dividend_data.empty:
+            div[i] = dividend_data
+
+    if div:
+        df = pd.concat(div, axis=1)
+        df.fillna(0)
+        df = df.T
+
+        df.columns = pd.to_datetime(df.columns)
+        df.columns = [date.strftime('%B %Y') for date in df.columns]
+
+        df = df.groupby(df.columns, axis=1).sum()
+        df = df[sorted(df.columns, key=pd.to_datetime)]
+        
+    else:
+        df = pd.DataFrame()
+
+    return df
 
 
 
